@@ -32,6 +32,7 @@ class PromptNormalizer(abc.ABC):
         sequence: int = -1,
         labels: Optional[dict[str, str]] = None,
         orchestrator_identifier: Optional[dict[str, str]] = None,
+        target_type: str = None,
     ) -> PromptRequestResponse:
         """
         Sends a single request to a target.
@@ -60,7 +61,7 @@ class PromptNormalizer(abc.ABC):
         response = None
 
         try:
-            response = await target.send_prompt_async(prompt_request=request)
+            response = await target.send_prompt_async(prompt_request=request, target_type=target_type)
             self._memory.add_request_response_to_memory(request=request)
         except Exception as ex:
             # Ensure request to memory before processing exception

@@ -194,7 +194,15 @@ class CrescendoOrchestrator(Orchestrator):
 
             logger.info("\nSending to EVAL_SCORER:\n")
 
-            if eval_percentage == 100:
+            # Log anything above some threshold because it may be highly relevant
+            # under human judgement.
+            if eval_flag and eval_percentage >= 90:
+                logger.info("\n*****---------------------------------------------------------------*****\n")
+                self._log_target_memory(conversation_id=self._prompt_target_conversation_id)
+                logger.info("\n^^^^^---------------------------------------------------------------^^^^^\n")
+
+
+            if eval_flag and eval_percentage == 100:
                 logger.info(f"Jailbreak Successful, EXITING at ROUND {round_num}")
                 break
 
@@ -258,6 +266,7 @@ class CrescendoOrchestrator(Orchestrator):
                     conversation_id=self._red_teaming_chat_conversation_id,
                     orchestrator_identifier=self.get_identifier(),
                     labels=self._global_memory_labels,
+                    target_type="attacker",
                 )
             )
             .request_pieces[0]
@@ -308,6 +317,7 @@ class CrescendoOrchestrator(Orchestrator):
                 conversation_id=self._prompt_target_conversation_id,
                 orchestrator_identifier=self.get_identifier(),
                 labels=self._global_memory_labels,
+                target_type="target",
             )
         ).request_pieces[0]
 
@@ -355,14 +365,14 @@ class CrescendoOrchestrator(Orchestrator):
         )
         for message in target_messages:
             if message.role == "user":
-                print(f"{Style.BRIGHT}{Fore.RED}{message.role}: {message.converted_value}\n")
+                logger.info(f"{Style.BRIGHT}{Fore.RED}{message.role}: {message.converted_value}\n")
             else:
-                print(f"{Style.NORMAL}{Fore.BLUE}{message.role}: {message.converted_value}\n")
+                logger.info(f"{Style.NORMAL}{Fore.BLUE}{message.role}: {message.converted_value}\n")
 
             scores = self._memory.get_scores_by_prompt_ids(prompt_request_response_ids=[str(message.id)])
             if scores and len(scores) > 0:
                 score = scores[0]
-                print(f"{Style.RESET_ALL}score: {score} : {score.score_rationale}")
+                logger.info(f"{Style.RESET_ALL}score: {score} : {score.score_rationale}")
 
     def _log_target_memory(self, *, conversation_id: str) -> None:
         """
@@ -374,3 +384,9 @@ class CrescendoOrchestrator(Orchestrator):
         target_messages = self._memory._get_prompt_pieces_with_conversation_id(conversation_id=conversation_id)
         for message in target_messages:
             logger.info(f"{message.role}: {message.converted_value}\n")
+        logger.info('<------------------------------------------------------->')
+        conversation_list = []
+        for message in target_messages:
+            role_message = {message.role: message.converted_value}
+            conversation_list.append(role_message)
+        logger.info(conversation_list)

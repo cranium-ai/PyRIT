@@ -119,7 +119,7 @@ class SelfAskTrueFalseScorer(Scorer):
 
     @pyrit_json_retry
     async def _send_chat_target_async(self, request, request_response_id):
-        response = await self._chat_target.send_prompt_async(prompt_request=request)
+        response = await self._chat_target.send_prompt_async(prompt_request=request, score_category=self._score_category)
 
         try:
             response_json = response.request_pieces[0].converted_value
