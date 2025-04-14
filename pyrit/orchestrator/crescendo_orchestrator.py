@@ -196,7 +196,7 @@ class CrescendoOrchestrator(Orchestrator):
 
             # Log anything above some threshold because it may be highly relevant
             # under human judgement.
-            if eval_flag and eval_percentage >= 90:
+            if eval_flag and eval_percentage >= 95:
                 logger.info("\n*****---------------------------------------------------------------*****\n")
                 self._log_target_memory(conversation_id=self._prompt_target_conversation_id)
                 logger.info("\n^^^^^---------------------------------------------------------------^^^^^\n")
@@ -219,7 +219,8 @@ class CrescendoOrchestrator(Orchestrator):
         logger.info("\nRED_TEAMING_CHAT MEMORY: ")
         self._log_target_memory(conversation_id=self._red_teaming_chat_conversation_id)
 
-        return eval_score
+        early_stopping = eval_flag and eval_percentage == 100
+        return eval_score, early_stopping
 
     @pyrit_json_retry
     async def _get_attack_prompt(
