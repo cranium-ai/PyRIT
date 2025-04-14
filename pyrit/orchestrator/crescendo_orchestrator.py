@@ -198,7 +198,7 @@ class CrescendoOrchestrator(Orchestrator):
             # under human judgement.
             if eval_flag and eval_percentage >= 95:
                 logger.info("\n*****---------------------------------------------------------------*****\n")
-                self._log_target_memory(conversation_id=self._prompt_target_conversation_id)
+                self._log_target_memory(score=eval_percentage, conversation_id=self._prompt_target_conversation_id)
                 logger.info("\n^^^^^---------------------------------------------------------------^^^^^\n")
 
 
@@ -375,7 +375,7 @@ class CrescendoOrchestrator(Orchestrator):
                 score = scores[0]
                 logger.info(f"{Style.RESET_ALL}score: {score} : {score.score_rationale}")
 
-    def _log_target_memory(self, *, conversation_id: str) -> None:
+    def _log_target_memory(self, *, score: int = None, conversation_id: str) -> None:
         """
         Prints the target memory for a given conversation ID.
 
@@ -390,4 +390,6 @@ class CrescendoOrchestrator(Orchestrator):
         for message in target_messages:
             role_message = {message.role: message.converted_value}
             conversation_list.append(role_message)
+        if score:
+            logger.info(f"Eval Score: {score}")
         logger.info(conversation_list)
