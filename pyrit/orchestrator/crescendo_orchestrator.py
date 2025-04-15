@@ -214,10 +214,6 @@ class CrescendoOrchestrator(Orchestrator):
             print("The crescendo orchestrator has not achieved the objective.")
 
         logger.info(f"\nFINAL RESULTS, TOTAL ROUNDS: {round_num}, TOTAL BACKTRACKS {backtrack_count}:\n")
-        logger.info("\nPROMPT_TARGET MEMORY: ")
-        self._log_target_memory(conversation_id=self._prompt_target_conversation_id)
-        logger.info("\nRED_TEAMING_CHAT MEMORY: ")
-        self._log_target_memory(conversation_id=self._red_teaming_chat_conversation_id)
 
         early_stopping = eval_flag and eval_percentage == 100
         return eval_score, early_stopping
