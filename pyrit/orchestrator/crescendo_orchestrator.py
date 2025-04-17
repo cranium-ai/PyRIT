@@ -134,7 +134,7 @@ class CrescendoOrchestrator(Orchestrator):
         last_response = ""
         eval_flag = False
         eval_percentage = None
-
+        conversation_list = []
         while round_num < max_rounds:
 
             round_num += 1
@@ -198,7 +198,7 @@ class CrescendoOrchestrator(Orchestrator):
             # under human judgement.
             if eval_flag and eval_percentage >= 95:
                 logger.info("\n*****---------------------------------------------------------------*****\n")
-                self._log_target_memory(score=eval_percentage, conversation_id=self._prompt_target_conversation_id)
+                conversation_list = self._log_target_memory(score=eval_percentage, conversation_id=self._prompt_target_conversation_id)
                 logger.info("\n^^^^^---------------------------------------------------------------^^^^^\n")
 
 
@@ -216,7 +216,7 @@ class CrescendoOrchestrator(Orchestrator):
         logger.info(f"\nFINAL RESULTS, TOTAL ROUNDS: {round_num}, TOTAL BACKTRACKS {backtrack_count}:\n")
 
         early_stopping = eval_flag and eval_percentage == 100
-        return eval_score, early_stopping
+        return eval_percentage, conversation_list, early_stopping
 
     @pyrit_json_retry
     async def _get_attack_prompt(
@@ -389,3 +389,4 @@ class CrescendoOrchestrator(Orchestrator):
         if score:
             logger.info(f"Eval Score: {score}")
         logger.info(conversation_list)
+        return conversation_list
